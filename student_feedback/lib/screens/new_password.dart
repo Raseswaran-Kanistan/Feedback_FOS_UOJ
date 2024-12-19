@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:student_feedback/router/router.dart';
 import 'package:student_feedback/screens/fade_animationtest.dart';
+import 'package:student_feedback/screens/password_changed.dart';
 import 'package:student_feedback/utils/hashing.dart';
 import 'package:student_feedback/utils/text_styles.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -89,13 +90,21 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
       // Perform password reset logic here
       final supabase = Supabase.instance.client;
 
-      await supabase.from('users').update({
-        'password_hash': hashPassword(_passwordController.text.trim()),
-      }).eq('email', widget.email);
-      // .then((_) =>
-      //     );
+      await supabase
+          .from('users')
+          .update({
+            'password_hash': hashPassword(_passwordController.text.trim()),
+          })
+          .eq('email', widget.email)
+          .onError((err, stack) {
+            print(err);
+          });
 
-      GoRouter.of(context).pushNamed(Routers.passwordchanges.name);
+      // GoRouter.of(context).pushNamed(Routers.passwordchanges.name);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PasswordChangesPage()),
+      );
     }
   }
 

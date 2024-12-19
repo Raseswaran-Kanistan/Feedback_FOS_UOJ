@@ -112,10 +112,11 @@ class _BothFeedbackPageSixState extends State<BothFeedbackPageSix>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Color(0xFF731C65), // Updated color
         title: Text(
-          'Integrated Student Evaluation Form: Theory and Practical',
+          'Student Evaluation Form',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -443,7 +444,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                       },
                       child: Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         child: item.child,
                       ),
                     );

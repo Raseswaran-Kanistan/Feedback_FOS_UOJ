@@ -27,6 +27,7 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF731C65),
@@ -49,7 +50,7 @@ class _Page1State extends State<Page1> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Student Evaluation Form',
+              'Student Evaluation Form - Theory',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),

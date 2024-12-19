@@ -158,6 +158,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                   children: [
                     // User Image
                     PopupMenuButton(
+                      color: Colors.white,
                       elevation: 8,
                       shadowColor: Colors.grey.shade800,
                       child: Image.network(

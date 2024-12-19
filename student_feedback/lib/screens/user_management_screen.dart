@@ -15,17 +15,20 @@ enum UserType {
 }
 
 class ManageUser extends StatefulWidget {
-  const ManageUser(
-      {super.key,
-      required this.userType,
-      required this.content,
-      required this.onUserAdded,
-      required this.onUpdate});
+  const ManageUser({
+    super.key,
+    required this.userType,
+    required this.content,
+    required this.onUserAdded,
+    required this.onUpdate,
+    required this.onDelete,
+  });
 
   final UserType userType;
   final List content;
   final Function(Map<String, String> value) onUserAdded;
   final Function(Map<String, String> value) onUpdate;
+  final Function(Map<String, String> value) onDelete;
 
   @override
   State<ManageUser> createState() => _ManageUserState();
@@ -33,6 +36,7 @@ class ManageUser extends StatefulWidget {
 
 class _ManageUserState extends State<ManageUser> {
   List _filteredContent = [];
+  List content = [];
   final supabase = Supabase.instance.client;
   bool spinner = false;
   String currentID = '';
@@ -41,7 +45,8 @@ class _ManageUserState extends State<ManageUser> {
 
   @override
   void initState() {
-    _filteredContent = widget.content;
+    content = widget.content;
+    _filteredContent = content;
     super.initState();
   }
 
@@ -133,10 +138,10 @@ class _ManageUserState extends State<ManageUser> {
                 onChanged: (query) {
                   setState(() {
                     if (query.isEmpty) {
-                      _filteredContent = widget.content;
+                      _filteredContent = content;
                     } else {
                       List temp = [];
-                      widget.content.forEach((element) {
+                      content.forEach((element) {
                         if (element
                             .toString()
                             .toLowerCase()
@@ -249,14 +254,24 @@ class _ManageUserState extends State<ManageUser> {
           ],
         ),
         const Spacer(),
-        Icon(
-          Icons.edit,
-          color: Colors.grey.shade600,
+        InkWell(
+          onTap: () {
+            _showEditUserAlert(details);
+          },
+          child: Icon(
+            Icons.edit,
+            color: Colors.grey.shade600,
+          ),
         ),
         const Gap(24),
-        const Icon(
-          Icons.delete,
-          color: Colors.redAccent,
+        InkWell(
+          onTap: () {
+            _deleteUser(details);
+          },
+          child: const Icon(
+            Icons.delete,
+            color: Colors.redAccent,
+          ),
         ),
         const Gap(8),
       ],
@@ -368,8 +383,86 @@ class _ManageUserState extends State<ManageUser> {
     );
   }
 
+  void _showEditUserAlert(details) {
+    _userIDController.text = details['SID'] ?? details['LID'];
+    _userEmailController.text = details['Semail'] ?? details['Lemail'];
+    // show alert dialog
+    showDialog(
+      context: context,
+      builder: (context) => Center(
+        child: Material(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _userIDController,
+                    decoration: InputDecoration(
+                      labelText:
+                          '${widget.userType.toString().split('.').last} ID',
+                      border: const OutlineInputBorder(),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF731C65)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _userEmailController,
+                    decoration: InputDecoration(
+                      labelText:
+                          '${widget.userType.toString().split('.').last} Email',
+                      border: const OutlineInputBorder(),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF731C65)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  CustomElevatedButton(
+                    width: 1000,
+                    message:
+                        'Update ${widget.userType.toString().split('.').last}',
+                    function: editUser,
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void editUser() async {
     bool err = false;
+
+    var user = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', _userEmailController.text.trim())
+        .single()
+        .onError((error, stackTrace) {
+      return {};
+    });
+
+    if (user.isNotEmpty) {
+      err = true;
+      Navigator.pop(context);
+      showMessage(context, 'Email already taken!');
+      return;
+    }
 
     await supabase
         .from('users')
@@ -386,11 +479,76 @@ class _ManageUserState extends State<ManageUser> {
     if (err) {
       Navigator.pop(context);
       showMessage(context, 'Something went wrong please try again!');
+      return;
     }
+
+    Map<String, String> value = {};
+
+    if (widget.userType == UserType.student) {
+      value = {
+        'SID': _userIDController.text.trim(),
+        'Sname': 'Unknown',
+        'Semail': _userEmailController.text.trim(),
+      };
+    } else {
+      value = {
+        'LID': _userIDController.text.trim(),
+        'Lname': 'Unknown',
+        'Lemail': _userEmailController.text.trim(),
+      };
+    }
+
+    var tempContent = [];
+    for (var content in _filteredContent) {
+      if ((content['SID'] ?? content['LID']) == _userIDController.text.trim()) {
+        tempContent.add(value);
+      } else {
+        tempContent.add(content);
+      }
+    }
+
+    setState(() {
+      _filteredContent = tempContent;
+    });
+
+    for (var content in widget.content) {
+      if ((content['SID'] ?? content['LID']) == _userIDController.text.trim()) {
+        tempContent.add(value);
+      } else {
+        tempContent.add(content);
+      }
+    }
+
+    setState(() {
+      content = tempContent;
+    });
+
+    widget.onUpdate(value);
+    Navigator.pop(context);
+    showMessage(context, 'User updated successfully!');
   }
 
   void addUser() async {
     bool err = false;
+
+    var user = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', _userEmailController.text.trim())
+        .single()
+        .onError((error, stackTrace) {
+      return {};
+    });
+
+    if (user.isNotEmpty) {
+      err = true;
+      Navigator.pop(context);
+      showMessage(context, 'Email already taken!');
+      return;
+    }
+
+    if (err == true) return;
+
     // setState(() => spinner = true);
     await supabase.from('users').insert({
       'email': _userEmailController.text.trim(),
@@ -441,5 +599,24 @@ class _ManageUserState extends State<ManageUser> {
     showMessage(context, 'User added successfully!');
     print('the response is $response');
     // setState(() => spinner = false);
+  }
+
+  _deleteUser(details) async {
+    bool? response = await confirmAction(
+        'Delete ${widget.userType.toString().split('.').last}!',
+        'Do you really want to remove this ${widget.userType.toString().split('.').last}?',
+        context);
+
+    if (response == null || !response) return;
+
+    await supabase
+        .from('users')
+        .delete()
+        .eq('id', (details['SID'] ?? details['LID']));
+
+    setState(() {
+      _filteredContent.remove(details);
+    });
+    widget.onDelete(details);
   }
 }

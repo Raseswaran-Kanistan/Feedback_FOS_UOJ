@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:go_router/go_router.dart';
 import 'package:student_feedback/router/router.dart';
 import 'package:student_feedback/screens/fade_animationtest.dart';
+import 'package:student_feedback/screens/new_password.dart';
 import 'dart:async';
 
 import 'package:student_feedback/utils/text_styles.dart';
@@ -70,16 +73,18 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
 }
 
 class OtpVerificationPage extends StatefulWidget {
-  const OtpVerificationPage({
+  OtpVerificationPage({
     super.key,
     this.onSuccess,
     this.otp,
     this.goRouteRouteName,
+    this.email,
   });
 
   final Function? onSuccess;
-  final int? otp;
+  int? otp;
   final String? goRouteRouteName;
+  final String? email;
 
   @override
   State<OtpVerificationPage> createState() => _OtpVerificationPageState();
@@ -87,6 +92,9 @@ class OtpVerificationPage extends StatefulWidget {
 
 class _OtpVerificationPageState extends State<OtpVerificationPage> {
   final TextEditingController _otpTextController = TextEditingController();
+  late Timer _countdownTimer;
+  int timer = 30;
+
   Future<void> _handleResendCode() async {
     // Display a confirmation dialog
     bool? confirm = await showDialog<bool>(
@@ -116,6 +124,20 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
     // If the user confirmed, resend the code
     if (confirm == true) {
+      final int otp = Random().nextInt(9999 - 1000) + 1000;
+
+      sendOTPEmail(
+        recipient: widget.email!,
+        otp: otp.toString(),
+        forgot: true,
+      );
+
+      setState(() {
+        widget.otp = otp;
+        timer = 30;
+        _countdownTimer.cancel();
+        _reduceTimer();
+      });
       // Code to resend the verification code
       // You might call an API or trigger an action to resend the code here
       // print("Resending verification code...");
@@ -134,8 +156,44 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       showMessage(context, 'Invalid OTP');
       return;
     }
-    GoRouter.of(context)
-        .pushNamed(widget.goRouteRouteName ?? Routers.newpassword.name);
+    // GoRouter.of(context)
+    //     .pushNamed( ?? Routers.newpassword.name);
+
+    if (widget.goRouteRouteName != null) {
+      GoRouter.of(context).pushNamed(widget.goRouteRouteName!);
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => NewPasswordPage(
+          email: widget.email!,
+        ),
+      ));
+    }
+  }
+
+  void _reduceTimer() {
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (this.timer <= 0) {
+        // Cancel the timer if it reaches zero
+        timer.cancel();
+      } else {
+        setState(() {
+          this.timer = this.timer - 1;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed to avoid memory leaks
+    _countdownTimer.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _reduceTimer();
+    super.initState();
   }
 
   @override
@@ -264,14 +322,32 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         style: hinttext,
                       ),
                       TextButton(
-                        onPressed: _handleResendCode,
-                        child: Text(
-                          "Resend",
-                          style: mediumTheme.copyWith(
-                            color: Color(0xFF3831ee),
+                        onPressed: timer > 0
+                            ? null // Disable button while timer is active
+                            : _handleResendCode,
+                        child: InkWell(
+                          onTap: () {
+                            if (timer > 0) return;
+                            _handleResendCode();
+                          },
+                          child: Text(
+                            "Resend",
+                            style: mediumTheme.copyWith(
+                              color: timer > 0
+                                  ? Colors.grey
+                                      .shade400 // Greyed-out when timer active
+                                  : const Color(
+                                      0xFF3831ee), // Active when timer reaches 0
+                            ),
                           ),
                         ),
                       ),
+                      // Timer display updated dynamically
+                      if (timer > 0)
+                        Text(
+                          '(${timer.toString()})',
+                          style: hinttext,
+                        ),
                     ],
                   ),
                 ),

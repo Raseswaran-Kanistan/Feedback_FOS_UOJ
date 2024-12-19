@@ -26,8 +26,24 @@ class ManageCoursePage extends StatefulWidget {
 }
 
 class _ManageCoursePageState extends State<ManageCoursePage> {
+  Map<String, dynamic> course = {};
   List students = [];
   final supabase = Supabase.instance.client;
+  Map spinner = {
+    'loading': false,
+    'type': '',
+  };
+
+  void setSpinner(bool value) => setState(() => spinner['loading'] = value);
+  void setSpinnerType(String value) => setState(() => spinner['type'] = value);
+  bool getSpinner(String type) => spinner['loading'] && spinner['type'] == type;
+
+  @override
+  void initState() {
+    course = widget.course;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +60,7 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
               const Gap(24),
               // course title
               Text(
-                widget.course['name'].toString(),
+                course['name'].toString(),
                 style: const TextStyle(
                   fontSize: 42,
                   height: 1,
@@ -54,7 +70,7 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
               const Gap(8),
               // course type
               Text(
-                widget.course['type'].toString(),
+                course['type'].toString(),
                 style: const TextStyle(
                   fontSize: 20,
                   height: 1,
@@ -72,12 +88,12 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
                     context: context,
                     builder: (context) => AddStudentPage(
                       onAddStudent: (studentId, studentData) {
-                        widget.course['students']
+                        course['students']
                             .add({'id': studentId, 'data': studentData});
                         widget.onUpdate();
                       },
-                      courseId: widget.course['id'],
-                      courseType: widget.course['type'],
+                      courseId: course['id'],
+                      courseType: course['type'],
                     ),
                   );
                 },
@@ -87,8 +103,9 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
                 'View Students',
                 icon: const Icon(Icons.people),
                 onTap: () {
-                  showStudentsDialog(
-                      widget.course['id'], widget.course['name']);
+                  setSpinner(true);
+                  setSpinnerType(('View students').toLowerCase());
+                  showStudentsDialog(course['id'], course['name']);
                 },
               ),
               const Gap(8),
@@ -114,9 +131,9 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => FeedbackView(
-                          courseID: widget.course['id'],
-                          courseType: widget.course['type'],
-                          courseName: widget.course['name'],
+                          courseID: course['id'],
+                          courseType: course['type'],
+                          courseName: course['name'],
                         ),
                       ));
                 },
@@ -170,6 +187,9 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
+              const Spacer(),
+              if (getSpinner(title.toLowerCase()))
+                const CircularProgressIndicator()
             ],
           ),
         ),
@@ -188,6 +208,7 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
         )
         .eq('course_type', widget.course['type'])
         .onError((error, stackTrace) {
+      setSpinner(false);
       print(error);
       return [];
     });
@@ -220,6 +241,8 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
                   courseId: courseId,
                   courseName: courseName,
                 )));
+
+    setSpinner(false);
   }
 
   void editCourse() {
@@ -232,10 +255,11 @@ class _ManageCoursePageState extends State<ManageCoursePage> {
                   widget.course = {
                     'id': courseId,
                     'name': courseName,
-                    'type': courseType,
+                    'type': courseType.toLowerCase(),
                     'students': (widget.course['students'] ??
                         []), // Keep the students unchanged
                   };
+                  course = widget.course;
                 });
 
                 widget.onUpdate();

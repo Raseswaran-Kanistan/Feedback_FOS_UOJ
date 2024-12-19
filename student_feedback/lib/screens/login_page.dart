@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:student_feedback/dashboard/admin_dashboard.dart';
+import 'package:student_feedback/dashboard/student_dashboard.dart';
+import 'package:student_feedback/dashboard/teacher_dashboard.dart';
 import 'package:student_feedback/router/router.dart';
 import 'dart:async';
 import 'package:student_feedback/utils/session_manager.dart';
@@ -179,12 +182,30 @@ class _LoginPageState extends State<LoginPage> {
         GoRouter.of(context).pushReplacementNamed(Routers.loginpage.name);
 
         if (response['role'] == 'student') {
-          GoRouter.of(context).pushReplacementNamed(Routers.studashboard.name);
+          // GoRouter.of(context).pushReplacementNamed(Routers.studashboard.name);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const StudentDashboard(),
+            ),
+          );
         } else if (response['role'] == 'admin') {
-          GoRouter.of(context)
-              .pushReplacementNamed(Routers.admindashboard.name);
+          // GoRouter.of(context)
+          //     .pushReplacementNamed(Routers.admindashboard.name);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AdminDashboard(),
+            ),
+          );
         } else if (response['role'] == 'lecturer') {
-          GoRouter.of(context).pushReplacementNamed(Routers.teadashboard.name);
+          // GoRouter.of(context).pushReplacementNamed(Routers.teadashboard.name);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TeacherDashboard(),
+            ),
+          );
         }
       } else {
         showMessage(context, 'Invalid password');

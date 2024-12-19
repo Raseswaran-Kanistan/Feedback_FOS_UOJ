@@ -99,6 +99,7 @@ class _Page5State extends State<Page5> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Color(0xFF731C65), // Updated color
         title: Text(
@@ -408,7 +409,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                       },
                       child: Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         child: item.child,
                       ),
                     );

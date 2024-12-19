@@ -80,7 +80,7 @@ final router = GoRouter(initialLocation: Routers.splashscreen.path, routes: [
     path: Routers.otpverification.path,
     name: Routers.otpverification.name,
     pageBuilder: (context, state) {
-      return const CupertinoPage(child: OtpVerificationPage());
+      return CupertinoPage(child: OtpVerificationPage());
     },
   ),
   GoRoute(

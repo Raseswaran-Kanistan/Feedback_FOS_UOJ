@@ -88,10 +88,11 @@ class _Page5State extends State<practicalPage5>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Color(0xFF731C65), // Updated color
         title: Text(
-          'Student Evaluation Form - Practical',
+          'Student Evaluation Form',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,

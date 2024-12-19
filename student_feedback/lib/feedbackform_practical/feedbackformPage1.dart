@@ -34,11 +34,12 @@ class _Page1State extends State<practicalPage1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF731C65),
         title: const Text(
-          'Student Evaluation Form - Practical',
+          'Student Evaluation Form ',
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(

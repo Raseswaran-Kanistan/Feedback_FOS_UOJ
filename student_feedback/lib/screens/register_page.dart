@@ -429,7 +429,7 @@ class _SignupPageState extends State<SignupPage> {
                         child: CustomElevatedButton(
                           message: "Register",
                           function: _verifyEmail,
-                          color: Color(0xFF0660c3),
+                          color: const Color(0xFF731C65),
                         ),
                       ),
                     ],

@@ -73,7 +73,15 @@ class _FeedbackViewState extends State<FeedbackView> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: isProcessing
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  Gap(8),
+                  Text('Processing Feedbacks...'),
+                ],
+              ))
             : SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

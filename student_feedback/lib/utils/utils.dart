@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gap/gap.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:student_feedback/screens/register_page.dart';
@@ -47,7 +48,7 @@ Future<void> sendOTPEmail({
 ''';
   try {
     final sendReport = await send(message, smtpServer);
-    // print('Message sent: $sendReport');
+    print('Message sent: $sendReport');
   } catch (e) {
     // print('Error occurred while sending email: $e');
   }
@@ -76,31 +77,42 @@ Future<bool?> confirmAction(
         borderRadius: BorderRadius.circular(12),
       ),
       title: Text(title),
-      content: Text(content),
-      actions: [
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.3,
-          height: 49,
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.grey.shade700,
-              // backgroundColor: Colors.greenAccent,
-              side: const BorderSide(color: Colors.grey),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(content),
+          const Gap(16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.3,
+                height: 49,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey.shade700,
+                    // backgroundColor: Colors.greenAccent,
+                    side: const BorderSide(color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('No'),
+                ),
               ),
-            ),
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('No'),
+              const Gap(16),
+              CustomElevatedButton(
+                color: Colors.redAccent,
+                width: MediaQuery.of(context).size.width * 0.3,
+                function: () => Navigator.pop(context, true),
+                message: 'Yes',
+              ),
+            ],
           ),
-        ),
-        CustomElevatedButton(
-          color: Colors.redAccent,
-          width: MediaQuery.of(context).size.width * 0.3,
-          function: () => Navigator.pop(context, true),
-          message: 'Yes',
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

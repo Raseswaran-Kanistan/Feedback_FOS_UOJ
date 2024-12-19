@@ -57,7 +57,7 @@ class _EditCoursePageState extends State<EditCoursePage> {
       selectedCourseType!,
     );
 
-    GoRouter.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   void showError(String message) {

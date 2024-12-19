@@ -111,6 +111,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     // User Image
                     PopupMenuButton(
+                      color: Colors.white,
                       elevation: 8,
                       shadowColor: Colors.grey.shade800,
                       child: Image.network(
@@ -152,7 +153,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ManageUser(
-                        onUpdate: (value) {},
+                        onDelete: (value) {
+                          setState(() {
+                            _filteredLecturers.remove(value);
+                          });
+                          _initializeData();
+                        },
+                        onUpdate: (value) {
+                          _initializeData();
+                        },
                         userType: UserType.lecturer,
                         content: _filteredLecturers,
                         onUserAdded: (value) {
@@ -173,11 +182,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ManageUser(
+                        onDelete: (value) {
+                          setState(() {
+                            _filteredStudents.remove(value);
+                          });
+                          _initializeData();
+                        },
                         onUpdate: (value) {
-                          // setState(() {
-                          //   _filteredStudents.where(
-                          //       (element) => element['SID'] == value['SID']);
-                          // });
+                          _initializeData();
                         },
                         userType: UserType.student,
                         content: _filteredStudents,
@@ -199,6 +211,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ManageUser(
+                        onDelete: (value) {},
                         onUpdate: (value) {},
                         userType: UserType.course,
                         content: _filteredCourses,

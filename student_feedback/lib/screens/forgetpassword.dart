@@ -228,6 +228,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => OtpVerificationPage(
+                                            email: _emailTextController.text,
                                             otp: otp,
                                             onSuccess: () {
                                               Navigator.push(

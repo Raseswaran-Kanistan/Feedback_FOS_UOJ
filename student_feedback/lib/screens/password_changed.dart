@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:student_feedback/screens/login_page.dart';
 import 'package:student_feedback/utils/text_styles.dart';
 
 class CustomElevatedButton extends StatefulWidget {
@@ -109,7 +110,11 @@ class _PasswordChangesPageState extends State<PasswordChangesPage> {
               child: CustomElevatedButton(
                 message: "Back to Login",
                 function: () {
-                  GoRouter.of(context).pushReplacement(Routers.loginpage.name);
+                  // GoRouter.of(context).pushReplacement(Routers.loginpage.name);
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()));
                 },
                 // color: Colors.black,
               ),

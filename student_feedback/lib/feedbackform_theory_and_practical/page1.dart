@@ -31,6 +31,7 @@ class _BothFeedbackPageOneState extends State<BothFeedbackPageOne> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF731C65),

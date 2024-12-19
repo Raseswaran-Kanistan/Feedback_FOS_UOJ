@@ -104,6 +104,7 @@ class _Page4State extends State<practicalPage4>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Color(0xFF731C65), // Updated color
         title: Text(
